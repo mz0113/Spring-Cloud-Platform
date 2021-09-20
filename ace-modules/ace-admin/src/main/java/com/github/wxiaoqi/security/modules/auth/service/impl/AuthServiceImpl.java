@@ -44,12 +44,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Map login(JwtAuthenticationRequest authenticationRequest) throws Exception {
+        //数据库不存明文，故需要把用户传来的密码也加密后进行对比
         UserInfo info = permissionService.validate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         if (!StringUtils.isEmpty(info.getId())) {
             JWTInfo jwtInfo = new JWTInfo(info.getUsername(), info.getId() + "", info.getName());
             String token = jwtTokenUtil.generateToken(jwtInfo);
             Map<String, String> result = new HashMap<>();
             result.put("accessToken", token);
+            //用户id
             result.put("id", info.id);
             WebUtils.getRequest();
             writeOnlineLog(jwtInfo);
@@ -95,6 +97,7 @@ public class AuthServiceImpl implements AuthService {
         onlineLog.setUserName(jwtInfo.getName());
         onlineLog.setLoginLocation(address);
         onlineLog.setOs(os);
+        //tokenID是一个shortUUID串
         stringRedisTemplate.opsForValue().set(RedisKeyConstant.REDIS_KEY_TOKEN + ":" + jwtInfo.getTokenId(), JSON.toJSONString(onlineLog, false), expire, TimeUnit.MINUTES);
         stringRedisTemplate.opsForZSet().add((RedisKeyConstant.REDIS_KEY_TOKEN), jwtInfo.getTokenId(), 0);
     }

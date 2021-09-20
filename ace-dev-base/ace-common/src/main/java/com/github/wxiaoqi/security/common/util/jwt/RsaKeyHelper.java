@@ -133,9 +133,19 @@ public class RsaKeyHelper {
         return keyPair.getPrivate().getEncoded();
     }
 
+    /**
+     *
+     * @param password 随机数的种子seed
+     * @return
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
     public static Map<String, byte[]> generateKey(String password) throws IOException, NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        //随机数器都是基于一个随机数种子生成，random类使用系统当前时间戳作为种子其实是可预测的伪随机。
+        //SecureRandom也是基于种子，但他也考虑了CPU占用，鼠标事件等等一系列随机情况来生成随机数。在现实世界上是不可以被预测的。
         SecureRandom secureRandom = new SecureRandom(password.getBytes());
+        //默认种子seed是0.源码中写的
         keyPairGenerator.initialize(1024, secureRandom);
         KeyPair keyPair = keyPairGenerator.genKeyPair();
         byte[] publicKeyBytes = keyPair.getPublic().getEncoded();

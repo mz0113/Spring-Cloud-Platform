@@ -17,7 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.github.wxiaoqi.security.common.constant.RedisKeyConstant.REDIS_KEY_CAPTCHA;
-
+/**
+ * 登录
+ */
 @RestController
 @RequestMapping("jwt")
 @Slf4j
@@ -47,6 +49,7 @@ public class AuthController {
         if (authenticationRequest.getVerCode() == null || !sessionCode.equals(authenticationRequest.getVerCode().trim().toLowerCase())) {
             throw new UserInvalidException("验证码不正确");
         }
+        //查库校验用户名密码，然后生成token串
         Map result = authService.login(authenticationRequest);
 
         return new ObjectRestResponse<>().data(result);

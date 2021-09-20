@@ -74,6 +74,7 @@ public class AccessGatewayFilter implements GlobalFilter {
         ServerHttpRequest request = serverWebExchange.getRequest();
         // 获取当前网关访问的URI
         String requestUri = request.getPath().pathWithinApplication().value();
+        log.info("requestURI:"+requestUri);
         if (requiredAttribute != null) {
             Iterator<URI> iterator = requiredAttribute.iterator();
             while (iterator.hasNext()) {

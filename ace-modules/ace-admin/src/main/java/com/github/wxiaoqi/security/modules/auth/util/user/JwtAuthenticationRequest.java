@@ -9,6 +9,9 @@ public class JwtAuthenticationRequest implements Serializable {
     private String username;
     private String password;
     private String verCode;
+    /**
+     * 图片验证码的UUID
+     */
     private String uuid;
 
     public JwtAuthenticationRequest(String username, String password, String verCode, String uuid) {

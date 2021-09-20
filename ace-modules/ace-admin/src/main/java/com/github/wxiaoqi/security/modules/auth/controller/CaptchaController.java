@@ -23,6 +23,9 @@ import static com.github.wxiaoqi.security.common.constant.RedisKeyConstant.REDIS
  * @author Ths Sun
  * @create 2020/7/26.
  */
+/**
+ * 验证码处理
+ */
 @RestController
 public class CaptchaController {
 
@@ -32,7 +35,7 @@ public class CaptchaController {
 
     @RequestMapping("/captcha")
     public ObjectRestResponse captcha() throws Exception {
-        // 三个参数分别为宽、高、位数
+        // 三个参数分别为宽、高、位数 引入github的jar
         SpecCaptcha specCaptcha = new SpecCaptcha(130, 48, 4);
         // 设置字体
         specCaptcha.setFont(new Font("Verdana", Font.PLAIN, 32));  // 有默认字体，可以不用设置
@@ -41,6 +44,7 @@ public class CaptchaController {
 
         String uuid = UUIDUtils.generateShortUuid();
         String text = specCaptcha.text().toLowerCase();
+        //redis key为uuid，value为图片验证码内容 这里还没有userId呢，验证码要先显示，一个验证码对应一个uuid 有效期2分钟
         stringRedisTemplate.opsForValue().set(String.format(REDIS_KEY_CAPTCHA, uuid), text, LOGIN_CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -49,6 +53,7 @@ public class CaptchaController {
         String captcha = Base64.byteArrayToBase64(stream.toByteArray());
         Map map = new HashMap<>();
         map.put("captcha", captcha);
+        //客户端请求需要携带这个验证码对应的uuid
         map.put("uuid", uuid);
         return new ObjectRestResponse().data(map);
     }
